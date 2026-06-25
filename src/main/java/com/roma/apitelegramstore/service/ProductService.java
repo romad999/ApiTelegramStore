@@ -22,7 +22,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    // создать продукт, но используя репозиторий, просто просим его сделать это
+    // создать продукт, но используя .save из репозитория. сам репозиторий пуст но наследуется от JpaRepository
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
