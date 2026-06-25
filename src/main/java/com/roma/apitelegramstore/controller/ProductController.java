@@ -1,6 +1,7 @@
 package com.roma.apitelegramstore.controller;
 
 import com.roma.apitelegramstore.dto.ProductRequestDto;
+import com.roma.apitelegramstore.mapper.ProductMapper;
 import com.roma.apitelegramstore.model.Product;
 import com.roma.apitelegramstore.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +13,11 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductMapper productMapper;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductMapper productMapper) {
         this.productService = productService;
+        this.productMapper = productMapper;
     }
 
     // вывести все продкуты, использует сервис
@@ -23,15 +26,10 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    // вывести все продкуты, использует сервис
+    // вывести все продкуты, использует сервис и маппер
     @PostMapping
     public Product create(@RequestBody ProductRequestDto dto) {
-
-        Product product = new Product();
-        product.setTitle(dto.getTitle());
-        product.setPrice(dto.getPrice());
-        product.setQuantity(dto.getQuantity());
-
+        Product product = productMapper.toEntity(dto);
         return productService.createProduct(product);
     }
 
