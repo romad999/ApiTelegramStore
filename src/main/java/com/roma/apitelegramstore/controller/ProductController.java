@@ -4,6 +4,7 @@ import com.roma.apitelegramstore.dto.ProductRequestDto;
 import com.roma.apitelegramstore.mapper.ProductMapper;
 import com.roma.apitelegramstore.model.Product;
 import com.roma.apitelegramstore.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class ProductController {
 
     // вывести все продкуты, использует сервис и маппер
     @PostMapping
-    public Product create(@RequestBody ProductRequestDto dto) {
+    public Product create(@Valid @RequestBody ProductRequestDto dto) {
         Product product = productMapper.toEntity(dto);
         return productService.createProduct(product);
     }
