@@ -1,5 +1,6 @@
 package com.roma.apitelegramstore.service;
 
+import com.roma.apitelegramstore.dto.ProductRequestDto;
 import com.roma.apitelegramstore.exception.NotEnoughStockException;
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
 import com.roma.apitelegramstore.model.Product;
@@ -12,22 +13,21 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
-
     ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
-    // вывести все продкуты, но используя репозиторий, просто просим его сделать это
+    // 1. вывести все продкуты, но используя репозиторий
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // создать продукт, но используя .save из репозитория. сам репозиторий пуст но наследуется от JpaRepository
+    // 2. создать продукт, но используя .save из репозитория. сам репозиторий пуст но наследуется от JpaRepository
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
 
-    // купить продукт, использует репозиторий, и два класса ошибки
+    // 3. купить продукт, использует репозиторий, и два класса ошибки
     public Product buyProduct(Long id, Integer quantityToBuy) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Товар с ID " + id + " не найден!"));
@@ -39,5 +39,35 @@ public class ProductService {
         product.setQuantity(product.getQuantity() - quantityToBuy);
 
         return productRepository.save(product);
+    }
+
+    // 4. найти продукт по id
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Товар с ID " + id + " не найден!"));
+    }
+
+    // 5. Обновить товар
+    public Product updateProduct(Long id, ProductRequestDto dto) {
+        Product product = getProductById(id);
+
+        if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
+            product.setTitle(dto.getTitle());
+        }
+        if (dto.getPrice() != null) {
+            product.setPrice(dto.getPrice());
+        }
+        if (dto.getQuantity() != null) {
+            product.setQuantity(dto.getQuantity());
+        }
+
+        return productRepository.save(product);
+    }
+
+    // 6. Удалить товар
+    public void deleteProduct(Long id) {
+        Product product = getProductById(id);
+
+        productRepository.delete(product);
     }
 }

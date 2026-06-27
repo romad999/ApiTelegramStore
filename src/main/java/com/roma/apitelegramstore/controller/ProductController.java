@@ -5,6 +5,7 @@ import com.roma.apitelegramstore.mapper.ProductMapper;
 import com.roma.apitelegramstore.model.Product;
 import com.roma.apitelegramstore.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,22 +22,41 @@ public class ProductController {
         this.productMapper = productMapper;
     }
 
-    // вывести все продкуты, использует сервис
+    // 1. вывести все продкуты, использует сервис
     @GetMapping
     public List<Product> getAll() {
         return productService.getAllProducts();
     }
 
-    // вывести все продкуты, использует сервис и маппер
+    // 2. вывести все продкуты, использует сервис и маппер
     @PostMapping
     public Product create(@Valid @RequestBody ProductRequestDto dto) {
         Product product = productMapper.toEntity(dto);
         return productService.createProduct(product);
     }
 
-    // купить продукт, использует сервис
+    // 3. купить продукт, использует сервис
     @PutMapping("/{id}/buy")
     public Product buy(@PathVariable Long id, @RequestParam Integer quantity) {
         return productService.buyProduct(id, quantity);
+    }
+
+    // 4. GET запрос на /api/products/{id}
+    @GetMapping("/{id}")
+    public Product getById(@PathVariable Long id) {
+        return productService.getProductById(id);
+    }
+
+    // 5. PUT запрос на /api/products/{id}
+    @PutMapping("/{id}")
+    public Product update(@PathVariable Long id, @RequestBody ProductRequestDto dto) {
+        return productService.updateProduct(id, dto);
+    }
+
+    // 6. DELETE запрос на /api/products/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }
