@@ -1,7 +1,6 @@
 package com.roma.apitelegramstore.service;
 
 import com.roma.apitelegramstore.dto.ProductRequestDto;
-import com.roma.apitelegramstore.exception.NotEnoughStockException;
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
 import com.roma.apitelegramstore.model.Product;
 import com.roma.apitelegramstore.repository.ProductRepository;
@@ -27,27 +26,13 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    // 3. купить продукт, использует репозиторий, и два класса ошибки
-    public Product buyProduct(Long id, Integer quantityToBuy) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Товар с ID " + id + " не найден!"));
-
-        if (product.getQuantity() < quantityToBuy) {
-            throw new NotEnoughStockException("Недостаточно товара на складе! Доступно: " + product.getQuantity());
-        }
-
-        product.setQuantity(product.getQuantity() - quantityToBuy);
-
-        return productRepository.save(product);
-    }
-
-    // 4. найти продукт по id
+    // 3. найти продукт по id
     public Product getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Товар с ID " + id + " не найден!"));
     }
 
-    // 5. Обновить товар
+    // 4. Обновить товар
     public Product updateProduct(Long id, ProductRequestDto dto) {
         Product product = getProductById(id);
 
@@ -64,7 +49,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    // 6. Удалить товар
+    // 5. Удалить товар
     public void deleteProduct(Long id) {
         Product product = getProductById(id);
 

@@ -35,25 +35,19 @@ public class ProductController {
         return productService.createProduct(product);
     }
 
-    // 3. купить продукт, использует сервис
-    @PutMapping("/{id}/buy")
-    public Product buy(@PathVariable Long id, @RequestParam Integer quantity) {
-        return productService.buyProduct(id, quantity);
-    }
-
-    // 4. GET запрос на /api/products/{id}
+    // 3. GET запрос на /api/products/{id}
     @GetMapping("/{id}")
     public Product getById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
 
-    // 5. PUT запрос на /api/products/{id}
+    // 4. PUT запрос на /api/products/{id}
     @PutMapping("/{id}")
     public Product update(@PathVariable Long id, @RequestBody ProductRequestDto dto) {
         return productService.updateProduct(id, dto);
     }
 
-    // 6. DELETE запрос на /api/products/{id}
+    // 5. DELETE запрос на /api/products/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.deleteProduct(id);
