@@ -1,6 +1,6 @@
---Liquibase formatted sql
+--liquibase formatted sql
 
---changeset Roma:1
+--changeset roma:1
 CREATE TABLE products (
                           id BIGSERIAL PRIMARY KEY,
                           title VARCHAR(255) NOT NULL,
