@@ -1,9 +1,5 @@
-package com.roma.apitelegramstore.controller;
+package com.roma.apitelegramstore.product;
 
-import com.roma.apitelegramstore.dto.ProductRequestDto;
-import com.roma.apitelegramstore.mapper.ProductMapper;
-import com.roma.apitelegramstore.model.Product;
-import com.roma.apitelegramstore.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

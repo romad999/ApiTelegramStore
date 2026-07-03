@@ -1,9 +1,6 @@
-package com.roma.apitelegramstore.service;
+package com.roma.apitelegramstore.product;
 
-import com.roma.apitelegramstore.dto.ProductRequestDto;
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
-import com.roma.apitelegramstore.model.Product;
-import com.roma.apitelegramstore.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

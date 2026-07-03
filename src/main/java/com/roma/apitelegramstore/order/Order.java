@@ -1,5 +1,6 @@
-package com.roma.apitelegramstore.model;
+package com.roma.apitelegramstore.order;
 
+import com.roma.apitelegramstore.product.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

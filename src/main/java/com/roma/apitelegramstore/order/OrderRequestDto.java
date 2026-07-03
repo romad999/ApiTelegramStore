@@ -1,4 +1,4 @@
-package com.roma.apitelegramstore.dto;
+package com.roma.apitelegramstore.order;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

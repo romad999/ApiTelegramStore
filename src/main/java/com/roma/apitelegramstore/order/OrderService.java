@@ -1,11 +1,9 @@
-package com.roma.apitelegramstore.service;
+package com.roma.apitelegramstore.order;
 
 import com.roma.apitelegramstore.exception.NotEnoughStockException;
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
-import com.roma.apitelegramstore.model.Order;
-import com.roma.apitelegramstore.model.Product;
-import com.roma.apitelegramstore.repository.OrderRepository;
-import com.roma.apitelegramstore.repository.ProductRepository;
+import com.roma.apitelegramstore.product.Product;
+import com.roma.apitelegramstore.product.ProductRepository;
 import org.springframework.stereotype.Service;
 
 @Service

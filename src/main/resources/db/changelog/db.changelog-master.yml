@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/01-create-products.sql
   - include:
       file: db/changelog/02-create-orders.sql
+  - include:
+      file: db/changelog/03-create-users.sql

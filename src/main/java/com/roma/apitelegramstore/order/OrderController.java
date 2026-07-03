@@ -1,8 +1,5 @@
-package com.roma.apitelegramstore.controller;
+package com.roma.apitelegramstore.order;
 
-import com.roma.apitelegramstore.dto.OrderRequestDto;
-import com.roma.apitelegramstore.model.Order;
-import com.roma.apitelegramstore.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

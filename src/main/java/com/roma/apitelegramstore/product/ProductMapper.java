@@ -1,7 +1,5 @@
-package com.roma.apitelegramstore.mapper;
+package com.roma.apitelegramstore.product;
 
-import com.roma.apitelegramstore.dto.ProductRequestDto;
-import com.roma.apitelegramstore.model.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 

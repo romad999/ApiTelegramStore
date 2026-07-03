@@ -1,6 +1,5 @@
-package com.roma.apitelegramstore.repository;
+package com.roma.apitelegramstore.product;
 
-import com.roma.apitelegramstore.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {

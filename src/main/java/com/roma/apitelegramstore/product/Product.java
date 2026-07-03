@@ -1,4 +1,4 @@
-package com.roma.apitelegramstore.model;
+package com.roma.apitelegramstore.product;
 
 import jakarta.persistence.*;
 import lombok.Getter;
