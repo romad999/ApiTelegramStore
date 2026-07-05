@@ -1,9 +1,12 @@
 package com.roma.apitelegramstore.config;
 
+import com.roma.apitelegramstore.user.JwtTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,6 +18,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtTokenFilter jwtTokenFilter;
+
+    SecurityConfig(JwtTokenFilter jwtTokenFilter) {
+        this.jwtTokenFilter = jwtTokenFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
@@ -41,8 +50,9 @@ public class SecurityConfig {
                         // 6. Всё остальное требует авторизации
                         .anyRequest().authenticated()
                 )
+                // ДОБАВЛЯЕМ НАШ ФИЛЬТР ТОКЕНОВ В ЦЕПОЧКУ ОХРАНЫ С ПРИОРИТЕТОМ!
+                .addFilterBefore(jwtTokenFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());
-
 
         return http.build();
     }
@@ -52,5 +62,12 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         // Этот инструмент будет автоматически шифровать пароли по алгоритму BCrypt
         return new BCryptPasswordEncoder();
+    }
+
+
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
