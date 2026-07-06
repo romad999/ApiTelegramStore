@@ -4,7 +4,10 @@ import com.roma.apitelegramstore.exception.NotEnoughStockException;
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
 import com.roma.apitelegramstore.product.Product;
 import com.roma.apitelegramstore.product.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -17,27 +20,46 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public Order createOrder(Long productId, Integer quantity, String customerName) {
-        // 1. Ищем товар в базе.
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Товар с ID " + productId + " не найден!"));
+    @Transactional
+    public Order createOrder(String customerName, List<OrderItemDto> itemDtos) {
 
-        // 2. Проверяем, хватает ли товара на складе
-        if (product.getQuantity() < quantity) {
-            throw new NotEnoughStockException("Недостаточно товара! Доступно: " + product.getQuantity());
-        }
-
-        // 3. Уменьшаем количество товара на складе и сохраняем его
-        product.setQuantity(product.getQuantity() - quantity);
-        productRepository.save(product);
-
-        // 4. Создаем новый объект заказа и заполняем его данными
+        // 1. Создаем сам объект Заказа (пока пустой, только с именем)
         Order order = new Order();
-        order.setProduct(product);
-        order.setQuantity(quantity);
         order.setCustomerName(customerName);
 
-        // 5. Сохраняем заказ в базу данных
+        // 2. Запускаем конвейер Stream API, чтобы превратить DTO в элементы заказа
+        List<OrderItem> orderItems = itemDtos.stream()
+                .map(dto -> {
+                    // Шаг А: Ищем каждый товар на складе по его ID
+                    Product product = productRepository.findById(dto.getProductId())
+                            .orElseThrow(() -> new ProductNotFoundException("Товар с ID " + dto.getProductId() + " не найден!"));
+
+                    // Шаг Б: Проверяем, хватает ли именно этого товара
+                    if (product.getQuantity() < dto.getQuantity()) {
+                        throw new NotEnoughStockException("Недостаточно товара " + product.getTitle() + "! Доступно: " + product.getQuantity());
+                    }
+
+                    // Шаг В: Списываем количество со склада
+                    product.setQuantity(product.getQuantity() - dto.getQuantity());
+                    productRepository.save(product); // Сохраняем обновленный склад
+
+                    // Шаг Г: Собираем Java-объект элемента корзины
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setOrder(order); // Привязываем к нашему общему заказу
+                    orderItem.setProduct(product);
+                    orderItem.setQuantity(dto.getQuantity());
+
+                    return orderItem; // Отправляем готовый элемент дальше по конвейеру
+                })
+                .toList(); // Собираем все элементы в один итоговый список
+
+        // 3. Закидываем собранную корзину в наш заказ
+        order.setItems(orderItems);
+
+        // 4. Сохраняем заказ в базу данных!
+        // Благодаря настройке cascade = CascadeType.ALL в классе Order,
+        // Spring сам автоматически сохранит и все элементы order_items в DataGrip!
         return orderRepository.save(order);
     }
+
 }

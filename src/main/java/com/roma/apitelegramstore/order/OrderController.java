@@ -18,10 +18,11 @@ public class OrderController {
 
     @PostMapping
     public Order create(@Valid @RequestBody OrderRequestDto dto) {
+
+        // Передаем в сервис имя покупателя и весь прилетевший список товаров из DTO!
         return orderService.createOrder(
-                dto.getProductId(),
-                dto.getQuantity(),
-                dto.getCustomerName()
+                dto.getCustomerName(),
+                dto.getItems()
         );
     }
 }
