@@ -1,10 +1,10 @@
 package com.roma.apitelegramstore.product;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -20,8 +20,13 @@ public class ProductController {
 
     // 1. вывести все продкуты, использует сервис
     @GetMapping
-    public List<Product> getAll() {
-        return productService.getAllProducts();
+    public Page<Product> getAll(
+            @RequestParam(defaultValue = "0") int page,         // Если клиент не указал страницу, берем 0-ю
+            @RequestParam(defaultValue = "10") int size,        // Если не указал размер, выдаем по 10 штук
+            @RequestParam(defaultValue = "id") String sortBy,    // Сортировка по умолчанию по ID
+            @RequestParam(defaultValue = "asc") String direction // По умолчанию по возрастанию
+    ) {
+        return productService.getAllProducts(page, size, sortBy, direction);
     }
 
     // 2. вывести все продкуты, использует сервис и маппер

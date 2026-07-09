@@ -1,9 +1,12 @@
 package com.roma.apitelegramstore.product;
 
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -13,10 +16,22 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    // 1. вывести все продкуты, но используя репозиторий
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+
+
+    // 1. вывести все продкуты
+    public Page<Product> getAllProducts(int page, int size, String sortBy, String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findAll(pageable);
     }
+
+
+
 
     // 2. создать продукт, но используя .save из репозитория. сам репозиторий пуст но наследуется от JpaRepository
     public Product createProduct(Product product) {
