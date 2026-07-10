@@ -14,10 +14,15 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final TelegramNotificationService telegramNotificationService; // НАШ НОВЫЙ ПОЧТАЛЬОН
 
-    OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
+
+    OrderService(OrderRepository orderRepository,
+                 ProductRepository productRepository,
+                 TelegramNotificationService telegramNotificationService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.telegramNotificationService = telegramNotificationService;
     }
 
     @Transactional
@@ -59,7 +64,11 @@ public class OrderService {
         // 4. Сохраняем заказ в базу данных!
         // Благодаря настройке cascade = CascadeType.ALL в классе Order,
         // Spring сам автоматически сохранит и все элементы order_items в DataGrip!
-        return orderRepository.save(order);
-    }
+        Order savedOrder = orderRepository.save(order);
 
+        // 5. МАГИЯ: Отправляем реальное уведомление в Telegram!
+        telegramNotificationService.sendOrderNotification(savedOrder);
+
+        return savedOrder;
+    }
 }

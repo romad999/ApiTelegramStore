@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestClient;
 
 
 @Configuration
@@ -64,10 +65,15 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+
+    //для телеграма, лалала
+    @Bean
+    public RestClient restClient() {
+        return RestClient.create();
     }
 }
