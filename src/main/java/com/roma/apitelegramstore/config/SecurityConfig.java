@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestClient;
 
+// тут гора импортов
 
 @Configuration
 @EnableWebSecurity
@@ -26,30 +27,31 @@ public class SecurityConfig {
         this.jwtTokenFilter = jwtTokenFilter;
     }
 
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable) // По-прежнему отключаем CSRF
-                .authorizeHttpRequests(auth -> auth
-                        // 1. ОТКРЫВАЕМ СИСТЕМНЫЕ ПУТИ ОШИБОК (Критически важно!)
-                        // Если внутри кода что-то пойдет не так, Спринг покажет текст ошибки, а не глупую 401
-                        .requestMatchers("/error", "/error/**").permitAll()
 
-                        // 2. Полностью открываем всю папку auth для любых методов (GET, POST)
-                        // Звездочки /** гарантируют, что и /api/auth/register, и любые другие ссылки тут будут открыты
+                .authorizeHttpRequests(auth -> auth
+                         // 1. Системные пути и авторизация доступны всем
+                        .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 3. Разрешаем всем просматривать товары (GET)
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                         // 2. Витрину товаров (GET) могут смотреть ВСЕ (и гости, и юзеры, и админ)
+                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
-                        // 4. Разрешаем всем делать заказы (POST)
-                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                         // 3. Создавать заказы (POST) и смотреть свою историю (GET /api/orders/history)
+                         // могут ТОЛЬКО авторизованные ПОКУПАТЕЛИ (или админ, если захочет)
+                         .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
 
-                        // 5. Создавать и удалять товары может только админ
-                        .requestMatchers("/api/products/**").hasRole("ADMIN")
+                         // 4. Управление товарами (POST, PUT, DELETE) — ТОЛЬКО для ВЛАДЕЛЬЦА (ADMIN)
+                         // Важно: Spring Security при проверке hasRole("ADMIN") будет искать в БД роль "ROLE_ADMIN".
+                         .requestMatchers("/api/products/**").hasRole("ADMIN")
 
-                        // 6. Всё остальное требует авторизации
-                        .anyRequest().authenticated()
+                         // 5. Всё остальное требует железной авторизации
+                         .anyRequest().authenticated()
                 )
                 // ДОБАВЛЯЕМ НАШ ФИЛЬТР ТОКЕНОВ В ЦЕПОЧКУ ОХРАНЫ С ПРИОРИТЕТОМ!
                 .addFilterBefore(jwtTokenFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
@@ -58,6 +60,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     // BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -65,13 +68,14 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // хз че это
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
     }
 
 
-    //для телеграма, лалала
+    // какой то бин для телеграма
     @Bean
     public RestClient restClient() {
         return RestClient.create();

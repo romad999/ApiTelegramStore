@@ -29,12 +29,16 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String role;
 
+
     // --- МЕТОДЫ ИНТЕРФЕЙСА USERDETAILS (ТЗ от Spring Security) ---
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        return List.of(new SimpleGrantedAuthority(role));
+        // Если в поле role хранится "ADMIN", превращаем в "ROLE_ADMIN"
+        // Если там уже сохранено "ROLE_ADMIN", то оставляем как есть
+        String prefixedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        return List.of(new SimpleGrantedAuthority(prefixedRole));
     }
+
 
     // Все проверки ниже мы просто возвращаем как true, чтобы аккаунт всегда был активен
     @Override
