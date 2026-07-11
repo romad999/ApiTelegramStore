@@ -1,5 +1,6 @@
 package com.roma.apitelegramstore.order;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.roma.apitelegramstore.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "customer_name")
-    private String customerName;
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY, чтобы не тащить юзера из базы каждый раз, когда нам нужен просто заказ
+    @JoinColumn(name = "user_id", nullable = false) // Указываем имя колонки в БД
+    private User user;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

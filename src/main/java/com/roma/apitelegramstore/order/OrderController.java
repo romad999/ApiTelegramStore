@@ -1,10 +1,10 @@
 package com.roma.apitelegramstore.order;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -21,8 +21,13 @@ public class OrderController {
 
         // Передаем в сервис имя покупателя и весь прилетевший список товаров из DTO!
         return orderService.createOrder(
-                dto.getCustomerName(),
                 dto.getItems()
         );
+    }
+
+
+    @GetMapping("/history")
+    public ResponseEntity<List<Order>> getMyOrderHistory() {
+        return ResponseEntity.ok(orderService.getCurrentUserOrderHistory());
     }
 }

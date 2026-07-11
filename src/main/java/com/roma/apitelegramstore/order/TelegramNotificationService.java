@@ -32,11 +32,15 @@ public class TelegramNotificationService {
                 .collect(Collectors.joining("\n"));
 
         String messageText = String.format(
-                "🎉 **Новый заказ в магазине!**\n\n" +
-                        "👤 Покупатель: %s\n" +
-                        "🆔 Номер заказа: #%d\n\n" +
-                        "🛒 Корзина покупок:\n%s",
-                order.getCustomerName(), order.getId(), itemsText
+                """
+                        🎉 **Новый заказ в магазине!**
+                        
+                        👤 Покупатель: %s
+                        🆔 Номер заказа: #%d
+                        
+                        🛒 Корзина покупок:
+                        %s""",
+                order.getUser().getUsername(), order.getId(), itemsText
         );
 
         // 2. БЕЗОПАСНАЯ СБОРКА URL через фабрику Спринга (без плюсиков!)

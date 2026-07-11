@@ -7,3 +7,7 @@ databaseChangeLog:
       file: db/changelog/03-create-users.sql
   - include:
       file: db/changelog/04-create-order-items.sql
+  - include:
+      file: db/changelog/05-add-user-to-orders.sql
+  - include:
+      file: db/changelog/06-drop-customer-name-from-orders.sql

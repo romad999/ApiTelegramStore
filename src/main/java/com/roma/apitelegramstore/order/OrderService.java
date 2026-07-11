@@ -4,10 +4,13 @@ import com.roma.apitelegramstore.exception.NotEnoughStockException;
 import com.roma.apitelegramstore.exception.ProductNotFoundException;
 import com.roma.apitelegramstore.product.Product;
 import com.roma.apitelegramstore.product.ProductRepository;
+import com.roma.apitelegramstore.user.User;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderService {
@@ -25,14 +28,32 @@ public class OrderService {
         this.telegramNotificationService = telegramNotificationService;
     }
 
+
+    public List<Order> getCurrentUserOrderHistory() {
+        // Снова достаем текущего юзера из контекста
+        User currentUser = (User) Objects.requireNonNull(SecurityContextHolder.getContext()
+                        .getAuthentication())
+                .getPrincipal();
+
+        // Возвращаем только его заказы
+        assert currentUser != null;
+        return orderRepository.findByUserId(currentUser.getId());
+    }
+
+
     @Transactional
-    public Order createOrder(String customerName, List<OrderItemDto> itemDtos) {
+    public Order createOrder(List<OrderItemDto> itemDtos) { // Убрали String customerName из аргументов
 
-        // 1. Создаем сам объект Заказа (пока пустой, только с именем)
+        // 1. Достаем текущего авторизованного пользователя из Spring Security
+        User currentUser = (User) Objects.requireNonNull(SecurityContextHolder.getContext()
+                        .getAuthentication())
+                .getPrincipal();
+
+        // 2. Создаем объект Заказа и привязываем к нему нашего юзера
         Order order = new Order();
-        order.setCustomerName(customerName);
+        order.setUser(currentUser); // Вместо setCustomerName
 
-        // 2. Запускаем конвейер Stream API, чтобы превратить DTO в элементы заказа
+        // 3. Запускаем конвейер Stream API (тут всё остаётся ОДИН В ОДИН, как у тебя)
         List<OrderItem> orderItems = itemDtos.stream()
                 .map(dto -> {
                     // Шаг А: Ищем каждый товар на складе по его ID
@@ -46,29 +67,28 @@ public class OrderService {
 
                     // Шаг В: Списываем количество со склада
                     product.setQuantity(product.getQuantity() - dto.getQuantity());
-                    productRepository.save(product); // Сохраняем обновленный склад
+                    productRepository.save(product);
 
                     // Шаг Г: Собираем Java-объект элемента корзины
                     OrderItem orderItem = new OrderItem();
-                    orderItem.setOrder(order); // Привязываем к нашему общему заказу
+                    orderItem.setOrder(order);
                     orderItem.setProduct(product);
                     orderItem.setQuantity(dto.getQuantity());
 
-                    return orderItem; // Отправляем готовый элемент дальше по конвейеру
+                    return orderItem;
                 })
-                .toList(); // Собираем все элементы в один итоговый список
+                .toList();
 
-        // 3. Закидываем собранную корзину в наш заказ
+        // 4. Закидываем собранную корзину в наш заказ
         order.setItems(orderItems);
 
-        // 4. Сохраняем заказ в базу данных!
-        // Благодаря настройке cascade = CascadeType.ALL в классе Order,
-        // Spring сам автоматически сохранит и все элементы order_items в DataGrip!
+        // 5. Сохраняем заказ в базу данных
         Order savedOrder = orderRepository.save(order);
 
-        // 5. МАГИЯ: Отправляем реальное уведомление в Telegram!
+        // 6. Отправляем реальное уведомление в Telegram
         telegramNotificationService.sendOrderNotification(savedOrder);
 
         return savedOrder;
     }
 }
+
