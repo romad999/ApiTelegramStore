@@ -29,7 +29,7 @@ public class ProductController {
         return productService.getAllProducts(page, size, sortBy, direction);
     }
 
-    // 2. вывести все продкуты, использует сервис и маппер
+    // 2. создание, использует сервис и маппер
     @PostMapping
     public Product create(@Valid @RequestBody ProductRequestDto dto) {
         Product product = productMapper.toEntity(dto);
